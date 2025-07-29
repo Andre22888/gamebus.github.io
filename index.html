@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Катание на автобусе</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            height: 100vh;
+            overflow: hidden;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            perspective: 1000px;
+        }
+        
+        .game-container {
+            width: 100%;
+            max-width: 500px;
+            height: 90vh;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .scene {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .scene.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .scene-title {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .scene-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .bus-stop {
+            width: 100%;
+            height: 200px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect x="0" y="150" width="400" height="50" fill="%23444"/><rect x="100" y="100" width="200" height="60" fill="%23ddd" stroke="%23333" stroke-width="2"/><rect x="110" y="110" width="180" height="40" fill="%23fff" stroke="%23333" stroke-width="1"/><circle cx="120" cy="170" r="10" fill="%23333"/><circle cx="280" cy="170" r="10" fill="%23333"/><text x="200" y="130" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333">Остановка</text></svg>') center/contain no-repeat;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        
+        .character {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 80px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 80"><circle cx="25" cy="20" r="15" fill="%23FFD700"/><rect x="15" y="35" width="20" height="30" fill="%2333CC33"/><line x1="10" y1="35" x2="40" y2="35" stroke="%2333CC33" stroke-width="10"/><line x1="15" y1="65" x2="15" y2="75" stroke="%23333" stroke-width="3"/><line x1="35" y1="65" x2="35" y2="75" stroke="%23333" stroke-width="3"/></svg>');
+            z-index: 10;
+            transition: all 1s ease;
+        }
+        
+        .bus {
+            width: 250px;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 100"><rect x="10" y="20" width="230" height="60" rx="10" fill="%23FF5722"/><rect x="20" y="30" width="210" height="40" fill="%23FFD700"/><circle cx="50" cy="80" r="15" fill="%23333"/><circle cx="200" cy="80" r="15" fill="%23333"/><rect x="40" y="35" width="170" height="30" fill="%23fff" opacity="0.8"/><text x="125" y="55" text-anchor="middle" font-family="Arial" font-size="24" fill="%23000" id="busNumber">?</text></svg>') center/contain no-repeat;
+            position: absolute;
+            left: -300px;
+            bottom: 50px;
+            transition: left 3s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        
+        .bus.arrived {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .inside-bus {
+            width: 100%;
+            height: 200px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200"><rect x="0" y="0" width="400" height="200" fill="%23FFD700"/><rect x="20" y="20" width="360" height="160" fill="%23FF5722" opacity="0.8"/><rect x="30" y="30" width="340" height="140" fill="%23fff" opacity="0.9"/><line x1="100" y1="30" x2="100" y2="170" stroke="%23333" stroke-width="2" stroke-dasharray="5,5"/><line x1="200" y1="30" x2="200" y2="170" stroke="%23333" stroke-width="2" stroke-dasharray="5,5"/><line x1="300" y1="30" x2="300" y2="170" stroke="%23333" stroke-width="2" stroke-dasharray="5,5"/><circle cx="350" cy="100" r="30" fill="%23FFD700" stroke="%23333" stroke-width="2"/></svg>') center/contain no-repeat;
+            margin: 20px 0;
+        }
+        
+        .conductor {
+            width: 60px;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 100"><circle cx="30" cy="25" r="15" fill="%23FFD700"/><rect x="20" y="40" width="20" height="40" fill="%236633CC"/><line x1="15" y1="40" x2="45" y2="40" stroke="%236633CC" stroke-width="10"/><line x1="20" y1="80" x2="20" y2="90" stroke="%23333" stroke-width="3"/><line x1="40" y1="80" x2="40" y2="90" stroke="%23333" stroke-width="3"/><rect x="25" y="45" width="10" height="20" fill="%23fff"/></svg>');
+            position: absolute;
+            right: 50px;
+            bottom: 50px;
+            transition: all 1s ease;
+        }
+        
+        .message-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            color: #333;
+            text-align: center;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 90%;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #ff8a00, #da1b60);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .btn-small {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        
+        .ticket {
+            width: 200px;
+            height: 120px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform-style: preserve-3d;
+            transform: rotateY(20deg);
+            margin: 20px auto;
+        }
+        
+        .ticket::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" opacity="0.1"><path d="M0,60 Q100,30 200,60 L200,120 L0,120 Z" fill="%23fff"/></svg>');
+        }
+        
+        .ticket-header {
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .ticket-content {
+            text-align: center;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .ticket-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #d35400;
+            margin: 10px 0;
+        }
+        
+        .ticket-qr {
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" fill="%23fff"/><rect x="5" y="5" width="20" height="20" fill="%23000"/><rect x="30" y="5" width="10" height="20" fill="%23000"/><rect x="45" y="5" width="20" height="20" fill="%23000"/><rect x="70" y="5" width="20" height="20" fill="%23000"/><rect x="5" y="30" width="20" height="10" fill="%23000"/><rect x="30" y="30" width="10" height="10" fill="%23000"/><rect x="45" y="30" width="20" height="10" fill="%23000"/><rect x="70" y="30" width="20" height="10" fill="%23000"/><rect x="5" y="45" width="20" height="20" fill="%23000"/><rect x="30" y="45" width="10" height="20" fill="%23000"/><rect x="45" y="45" width="20" height="20" fill="%23000"/><rect x="70" y="45" width="20" height="20" fill="%23000"/><rect x="5" y="70" width="20" height="20" fill="%23000"/><rect x="30" y="70" width="10" height="20" fill="%23000"/><rect x="45" y="70" width="20" height="20" fill="%23000"/><rect x="70" y="70" width="20" height="20" fill="%23000"/></svg>') center/contain no-repeat;
+            margin: 0 auto;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(to right, #00b09b, #96c93d);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+        
+        .bounce {
+            animation: bounce 0.5s ease infinite alternate;
+        }
+        
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        
+        .pulse {
+            animation: pulse 1.5s ease infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 500px) {
+            .game-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .scene-title {
+                font-size: 24px;
+            }
+            
+            .btn {
+                padding: 12px 25px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="scene active" id="scene-stop">
+            <h1 class="scene-title">Автобусная Остановка</h1>
+            <div class="scene-content">
+                <div class="bus-stop"></div>
+                <div class="character bounce" id="character"></div>
+                
+                <div class="message-box">
+                    <p>Вы стоите на остановке и ждёте автобус.</p>
+                    <p>Номер нужного автобуса: <strong id="bus-number">?</strong></p>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                
+                <p>Ожидаем автобус...</p>
+            </div>
+        </div>
+        
+        <div class="scene" id="scene-bus">
+            <h1 class="scene-title">Автобус Прибыл!</h1>
+            <div class="scene-content">
+                <div class="bus" id="bus"></div>
+                <div class="message-box">
+                    <p>Автобус <strong id="arrived-bus-number">?</strong> прибыл на остановку!</p>
+                </div>
+                <button class="btn" id="enter-bus-btn">Войти в автобус</button>
+            </div>
+        </div>
+        
+        <div class="scene" id="scene-inside">
+            <h1 class="scene-title">В Автобусе</h1>
+            <div class="scene-content">
+                <div class="inside-bus"></div>
+                <div class="conductor" id="conductor"></div>
+                
+                <div class="message-box">
+                    <p>К вам подходит кондуктор и просит предъявить билет.</p>
+                </div>
+                
+                <button class="btn pulse" id="show-ticket-btn">Предъявить билет</button>
+            </div>
+        </div>
+        
+        <div class="scene" id="scene-no-ticket">
+            <h1 class="scene-title">Билет Не Найден!</h1>
+            <div class="scene-content">
+                <div class="ticket">
+                    <div class="ticket-header">Билет отсутствует</div>
+                    <div class="ticket-content">
+                        <div class="ticket-number">🚫</div>
+                        <p>У вас нет действительного билета</p>
+                    </div>
+                </div>
+                
+                <div class="message-box">
+                    <p>Кондуктор не обнаружил у вас билет. Вам нужно приобрести его!</p>
+                </div>
+                
+                <button class="btn" id="buy-ticket-btn">Купить билет</button>
+            </div>
+        </div>
+        
+        <div class="scene" id="scene-valid-ticket">
+            <h1 class="scene-title">Билет Проверен!</h1>
+            <div class="scene-content">
+                <div class="ticket">
+                    <div class="ticket-header">Автобусный Билет</div>
+                    <div class="ticket-content">
+                        <div class="ticket-number" id="ticket-number">#0000</div>
+                        <p>Действителен на 1 поездку</p>
+                        <div class="ticket-qr"></div>
+                    </div>
+                </div>
+                
+                <div class="message-box">
+                    <p>Билет проверен! Приятной поездки!</p>
+                </div>
+                
+                <button class="btn" id="play-again-btn">Сыграть снова</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            
+            const scenes = {
+                stop: document.getElementById('scene-stop'),
+                bus: document.getElementById('scene-bus'),
+                inside: document.getElementById('scene-inside'),
+                noTicket: document.getElementById('scene-no-ticket'),
+                validTicket: document.getElementById('scene-valid-ticket')
+            };
+            
+            const busNumberElement = document.getElementById('bus-number');
+            const arrivedBusNumberElement = document.getElementById('arrived-bus-number');
+            const progressBar = document.getElementById('progress-bar');
+            const enterBusBtn = document.getElementById('enter-bus-btn');
+            const showTicketBtn = document.getElementById('show-ticket-btn');
+            const buyTicketBtn = document.getElementById('buy-ticket-btn');
+            const playAgainBtn = document.getElementById('play-again-btn');
+            const ticketNumberElement = document.getElementById('ticket-number');
+            const busElement = document.getElementById('bus');
+            const conductorElement = document.getElementById('conductor');
+            
+            let targetBusNumber;
+            
+            function generateBusNumber() {
+                targetBusNumber = Math.floor(Math.random() * 99) + 1;
+                busNumberElement.textContent = targetBusNumber;
+                return targetBusNumber;
+            }
+            
+            document.getElementById('show-ticket-btn').addEventListener('click', function() {
+            window.location.href = 'ticket.html';
+        });
+        
+            function switchScene(targetScene) {
+                Object.values(scenes).forEach(scene => {
+                    scene.classList.remove('active');
+                });
+                setTimeout(() => {
+                    scenes[targetScene].classList.add('active');
+                }, 300);
+            }
+            
+            function animateBusArrival() {
+                busElement.classList.remove('arrived');
+                setTimeout(() => {
+                    busElement.classList.add('arrived');
+                    arrivedBusNumberElement.textContent = targetBusNumber;
+                    
+                    const busSvg = busElement.style.backgroundImage;
+                    busElement.style.backgroundImage = busSvg.replace(/#busNumber">[^<]+/, `#busNumber">${targetBusNumber}`);
+                }, 100);
+            }
+            
+            function animateConductor() {
+                conductorElement.style.right = '-100px';
+                setTimeout(() => {
+                    conductorElement.style.right = '50px';
+                }, 100);
+            }
+        
+            function generateTicketNumber() {
+                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+                let result = '';
+                for (let i = 0; i < 6; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+            
+            function isTelegramWebApp() {
+                return window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.isExpanded;
+            }
+
+            if (!isTelegramWebApp()) {
+                window.location.href = "https://example.com";
+            }
+            
+            function isTelegramWebApp() {
+                if (window.Telegram?.WebApp?.isExpanded) return true;
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.has('tgWebAppStartParam') || urlParams.has('tgWebAppPlatform');
+            }
+
+            if (isTelegramWebApp()) {
+                document.body.style.display = "block";
+                Telegram.WebApp.ready();
+            }
+
+            function initGame() {
+                generateBusNumber();
+                
+                switchScene('stop');
+                
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress += 1;
+                    progressBar.style.width = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(progressInterval);
+                        setTimeout(() => {
+                            switchScene('bus');
+                            animateBusArrival();
+                        }, 500);
+                    }
+                }, 50);
+            }
+            
+            enterBusBtn.addEventListener('click', () => {
+                switchScene('inside');
+                setTimeout(animateConductor, 500);
+            });
+            
+            showTicketBtn.addEventListener('click', () => {
+                if (Math.random() < 0.7) {
+                    const ticketNum = generateTicketNumber();
+                    ticketNumberElement.textContent = `#${ticketNum}`;
+                    switchScene('validTicket');
+                } else {
+                    switchScene('noTicket');
+                }
+            });
+            
+            playAgainBtn.addEventListener('click', () => {
+                initGame();
+            });
+            
+            initGame();
+        });
+
+        Telegram.WebApp.MainButton.setText("OK").show();
+
+    </script>
+</body>
+</html>

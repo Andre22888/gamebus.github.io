@@ -1,0 +1,842 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1">
+    <title>САЙТ НЕ ЯВЛЯЕТСЯ ОРИГИНАЛЬНЫМ ПРИОЛОЖЕНИЕМ, СДЕЛАН ИСКЛЮЧИТЕЛЬНО ДЛЯ ШУТКИ</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        @font-face {
+            font-family: 'Telegram Font';
+            src: url('https://core.telegram.org/font/ttf/telegram-sans.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        body {
+            font-family: 'Telegram Font', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #1e1e1e;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .ticket-container {
+            flex: 1;
+            padding: 0;
+            background: #1e1e1e;
+            margin: 0;
+        }
+        
+        .valid-time {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: white;
+            margin: 20px 0 15px 0;
+            letter-spacing: 0.2px;
+            background: #1e1e1e;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 0;
+            border-bottom: 1px solid #333;
+            background: #1e1e1e;
+            margin-top: 10px;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            color: white;
+            border-bottom: 3px solid transparent;
+            user-select: none;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .tab.active {
+            color: #e21a1a;
+            border-bottom: 3px solid #e21a1a;
+        }
+        
+        .tab-icon {
+            width: 22px;
+            height: 22px;
+            filter: brightness(0) invert(1);
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+        }
+        
+        .tab.active .tab-icon {
+            filter: brightness(0) invert(16%) sepia(89%) saturate(4624%) hue-rotate(358deg) brightness(93%) contrast(101%);
+        }
+        
+        .ticket-content {
+            display: none;
+            padding: 16px;
+            color: white;
+            background: #1e1e1e;
+        }
+        
+        .ticket-content.active {
+            display: block;
+        }
+
+        .ticket-number {
+        font-size: 20px;
+        font-weight: 500;
+        margin-top: 15px;
+        letter-spacing: 0.5px;
+        color: white;
+        text-align: center;
+        opacity: 0.9;
+        }
+
+        .qr-code-container .section-title {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 15px;
+        opacity: 0.8;
+        }
+
+        .close-btn {
+        width: 100%;
+        padding: 12px 15px;
+        background: #e21a1a;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: transform 0.1s ease;
+        }
+
+        .close-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .section {
+            margin-bottom: 16px;
+            background: #1e1e1e;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .section-icon {
+            width: 26px;
+            height: 26px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+        }
+        
+        .section-content-wrapper {
+            flex: 1;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #adadad;
+            margin-bottom: 4px;
+            letter-spacing: 0.1px;
+            background: #1e1e1e;
+            opacity: 0.8;
+        }
+        
+        .section-title.editable {
+            background: #1e1e1e;
+        }
+        
+        .section-title.editable:hover {
+            background: #252525;
+        }
+        
+        .section-content {
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            line-height: 1.5;
+            padding: 5px 0;
+            border-radius: 4px;
+            min-height: 26px;
+            background: #1e1e1e;
+        }
+        
+        .section-content.editable {
+            background: #1e1e1e;
+        }
+        
+        .section-content.editable:hover {
+            background: #252525;
+        }
+        
+        .bus-number {
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            opacity: 0.8;
+        }
+        
+        .divider {
+            height: 1px;
+            background: #333;
+            margin: 18px 0;
+            width: 100%;
+        }
+        
+        .qr-code-container {
+            text-align: center;
+            margin: 30px 0;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .qr-code {
+            width: 240px;
+            height: 240px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #333;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-top: 10px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+        }
+        
+        .qr-code img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            -webkit-user-drag: none;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            pointer-events: none;
+        }
+        
+        .close-btn-container {
+            padding: 12px 16px;
+            background: #1e1e1e;
+            border-top: 1px solid #333;
+        }
+        
+        .close-btn {
+            width: 100%;
+            padding: 12px 15px;
+            background: #e21a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .save-btn-container {
+            padding: 18px;
+            background: #1e1e1e;
+            border-top: 1px solid #333;
+            display: none;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 15px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        input.edit-field {
+            width: 100%;
+            background: #252525;
+            border: none;
+            border-bottom: 1px solid #555;
+            color: white;
+            font-family: 'Telegram Font', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 5px 8px;
+            outline: none;
+            border-radius: 4px;
+        }
+        
+        .password-container {
+            padding: 16px;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 24px;
+            outline: none;
+            text-align: center;
+            letter-spacing: 8px;
+            font-family: monospace;
+        }
+        
+        .password-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        
+        .changes-input {
+            width: 100%;
+            padding: 12px;
+            background: #252525;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+        
+        .submit-password-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e21a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        
+        .password-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #1e1e1e;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .password-error {
+            color: #ff4444;
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .unlimited-mode {
+            color: #2ecc71;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        
+        img {
+            -webkit-user-drag: none;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .routes-popup {
+            position: absolute;
+            top: 100%;
+            left: 42px;
+            right: 0;
+            background: #252525;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            margin-top: 5px;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .route-item {
+            padding: 12px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+        }
+        
+        .route-item:last-child {
+            border-bottom: none;
+        }
+        
+        .route-item:hover {
+            background: #333;
+        }
+        
+        .custom-route {
+            color: #e21a1a;
+            font-weight: bold;
+        }
+
+        .password-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: white;
+            animation: blink 1s infinite;
+        }
+
+        .bot-link {
+            color: #3390ec;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .bot-link:hover {
+            text-decoration: underline;
+        }
+
+        @keyframes blink {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body>
+    <div class="password-screen" id="passwordScreen">
+        <div class="password-header">
+            Пароль можно купить в боте <span class="bot-link" id="botLink">@rhsbxueiwj9292msbot</span>
+        </div>
+        <div class="password-container">
+            <div class="password-label">Введите пароль:</div>
+            <input type="tel" class="password-input" id="passwordInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" autofocus>
+            <div class="password-error" id="passwordError">Неверный пароль! Попробуйте снова.</div>
+            <div class="unlimited-mode" id="unlimitedMode">Активирован безлимитный режим!</div>
+            
+            <!-- <div class="password-label" style="margin-top: 16px;">Количество доступных изменений:</div>
+            <input type="number" class="changes-input" id="changesInput" min="1" value="1"> -->
+            
+            <button class="submit-password-btn" id="submitPasswordBtn">ПОДТВЕРДИТЬ</button>
+        </div>
+    </div>
+    
+    <div class="ticket-container" id="ticketContainer" style="display: none;">
+        <div class="valid-time" id="validTimeEl" style="display: none;">Действует: <span id="validTime">15</span> сек.</div>
+        
+        <div class="tabs">
+            <div class="tab active" id="ticketTab">
+                <img src="bilet.png" class="tab-icon" alt="Билет">
+                1 002 583 331
+            </div>
+            <div class="tab" id="controlTab">
+                <img src="per1.png" class="tab-icon" alt="Контроль">
+                Контроль
+            </div>
+        </div>
+        
+        <div class="ticket-content active" id="ticketInfo">
+            <div class="section">
+                <img src="per.png" class="section-icon" alt="Перевозчик">
+                <div class="section-content-wrapper">
+                    <div class="section-title">Перевозчик</div>
+                    <div class="section-content editable" id="carrierField">КПАТП-5</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section" id="routeSection">
+                <img src="avob.png" class="section-icon" alt="Маршрут">
+                <div class="section-content-wrapper">
+                    <div class="section-title editable" id="routeTitleField">Крадиоцентр - Спорткомплекс "Радуга"</div>
+                    <div class="section-content editable" id="routeField">н878ру124</div>
+                </div>
+                <div class="routes-popup" id="routesPopup">
+                    <div class="route-item" data-route='6 Кардиоцентр - ДК "Кировский"'>6 Кардиоцентр - ДК "Кировский"</div>
+                    <div class="route-item" data-route='11 3-я Дальневосточная - Молодежная'>11 3-я Дальневосточная - Молодежная</div>
+                    <div class="route-item" data-route="21 Лентяево - Дережабль">21 Спортзал - Парк "Прищепка"</div>
+                    <div class="route-item" data-route='49 Кардиоцентр - Спорткомплекс "Радуга"'>49 Кардиоцентр - Спорткомплекс "Радуга"</div>
+                    <div class="route-item" data-route="81 Ж/д больница — Сибирский элемент">81 Ж/д больница — Сибирский элемент</div>
+                    <div class="route-item" data-route="88 Академия биатлона — Спортзал">88 Академия биатлона — Спортзал</div>
+                    <div class="route-item custom-route">Свой маршрут</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <img src="rub.png" class="section-icon" alt="Стоимость">
+                <div class="section-content-wrapper">
+                    <div class="section-title">Стоимость</div>
+                    <div class="section-content editable" id="priceField">1 шт., Полный, 35.00 ₽</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <img src="calendar.png" class="section-icon" alt="Дата покупки">
+                <div class="section-content-wrapper">
+                    <div class="section-title">Дата покупки</div>
+                    <div class="section-content editable" id="dateField">1 июня 2025 г.</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <img src="time.png" class="section-icon" alt="Время покупки">
+                <div class="section-content-wrapper">
+                    <div class="section-title">Время покупки</div>
+                    <div class="section-content editable" id="timeField">10:06</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="ticket-content" id="controlInfo">
+            <div class="qr-code-container">
+                <div class="section-title">Контроль</div>
+                <div class="qr-code" id="qrCode">
+                    <img src="qrstone.jpg" alt="QR Code">
+                </div>
+                <div class="ticket-number">№ 1 002 583 331</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="save-btn-container" id="saveBtnContainer">
+        <button class="save-btn" id="saveBtn">Применить изменения</button>
+    </div>
+    
+    <div class="close-btn-container" id="closeBtnContainer">
+        <button class="close-btn" id="closeBtn">ЗАКРЫТЬ</button>
+    </div>
+
+    <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const TI2 = 345710;
+    const STORAGE_KEY = 'ticket_app_v2';
+
+    function dataEncrypt(input) {
+        return (input * 17 + 12345) % 1000000;
+    }
+
+    function dataDecrypt(encrypted) {
+        let temp = (encrypted - 12345) % 1000000;
+        if (temp < 0) temp += 1000000;
+        return (temp * 882353) % 1000000;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const accessScreen = document.getElementById('passwordScreen');
+        const ticketContainer = document.getElementById('ticketContainer');
+        const accessInput = document.getElementById('passwordInput');
+        const accessError = document.getElementById('passwordError');
+        const unlimitedMode = document.getElementById('unlimitedMode');
+        const submitAccessBtn = document.getElementById('submitPasswordBtn');
+        const botLink = document.getElementById('botLink');
+        
+        const closeBtn = document.getElementById('closeBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const ticketTab = document.getElementById('ticketTab');
+        const controlTab = document.getElementById('controlTab');
+        const ticketInfo = document.getElementById('ticketInfo');
+        const controlInfo = document.getElementById('controlInfo');
+        const saveBtnContainer = document.getElementById('saveBtnContainer');
+        const closeBtnContainer = document.getElementById('closeBtnContainer');
+        const validTimeEl = document.getElementById('validTimeEl');
+        const routesPopup = document.getElementById('routesPopup');
+        const routeTitleField = document.getElementById('routeTitleField');
+        const routeSection = document.getElementById('routeSection');
+        
+        botLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.open('http://t.me/rhsbxueiwj9292msbot', '_blank');
+        });
+        
+        const editableFields = [
+            { id: 'carrierField', value: 'КПАТП-5' },
+            { id: 'routeTitleField', value: '49 Крадиоцентр - Спорткомплекс "Радуга"' },
+            { id: 'routeField', value: 'н878ру124' },
+            { id: 'priceField', value: '1 шт., Полный, 35.00 ₽' },
+            { id: 'dateField', value: '3 апреля 2025 г.' },
+            { id: 'timeField', value: '10:06' }
+        ];
+        
+        let editedFields = {};
+        let isAnyFieldEditing = false;
+        let isUnlockMode = false;
+
+        accessInput.focus();
+        
+        accessInput.addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+            accessError.style.display = 'none';
+        });
+        
+        submitAccessBtn.addEventListener('click', function() {
+            const enteredCode = parseInt(accessInput.value);
+            if (isNaN(enteredCode)) {
+                accessError.style.display = 'block';
+                accessInput.value = '';
+                accessInput.focus();
+                return;
+            }
+
+            if (dataEncrypt(enteredCode) === TI2) {
+                isUnlockMode = true;
+                unlimitedMode.style.display = 'block';
+                localStorage.setItem(STORAGE_KEY, 'true');
+                showTicketInterface();
+            } else {
+                accessError.style.display = 'block';
+                accessInput.value = '';
+                accessInput.focus();
+            }
+        });
+        
+        accessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                submitAccessBtn.click();
+            }
+        });
+        
+        function showTicketInterface() {
+            accessScreen.style.display = 'none';
+            ticketContainer.style.display = 'block';
+        }
+        
+        editableFields.forEach(field => {
+            const element = document.getElementById(field.id);
+            
+            element.addEventListener('click', function(e) {
+                if (field.id === 'routeTitleField') {
+                    if (routesPopup.style.display === 'block') {
+                        routesPopup.style.display = 'none';
+                        return;
+                    }
+                    
+                    routesPopup.style.display = 'block';
+                    e.stopPropagation();
+                    return;
+                }
+                
+                if (isAnyFieldEditing) return;
+                
+                isAnyFieldEditing = true;
+                
+                const text = element.textContent;
+                element.innerHTML = `<input class="edit-field" id="editInput_${field.id}" value="${text}" autofocus>`;
+                
+                const input = document.getElementById(`editInput_${field.id}`);
+                input.focus();
+                input.select();
+                
+                saveBtnContainer.style.display = 'block';
+                closeBtnContainer.style.display = 'none';
+                
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        finishEditing(field.id, input.value.trim() || field.value);
+                        moveToNextField(field.id);
+                    }
+                });
+                
+                input.addEventListener('blur', function() {
+                    finishEditing(field.id, input.value.trim() || field.value);
+                });
+            });
+        });
+        
+        function finishEditing(fieldId, value) {
+            if (!isAnyFieldEditing && fieldId !== 'routeTitleField') return;
+            
+            editedFields[fieldId] = value;
+            document.getElementById(fieldId).textContent = value;
+            
+            isAnyFieldEditing = false;
+        }
+        
+        function moveToNextField(currentFieldId) {
+            const currentIndex = editableFields.findIndex(f => f.id === currentFieldId);
+            if (currentIndex < editableFields.length - 1) {
+                const nextFieldId = editableFields[currentIndex + 1].id;
+                document.getElementById(nextFieldId).click();
+            }
+        }
+        
+        saveBtn.addEventListener('click', function() {
+            if (isAnyFieldEditing) {
+                const activeInput = document.querySelector('input.edit-field');
+                if (activeInput) {
+                    const fieldId = activeInput.id.replace('editInput_', '');
+                    finishEditing(fieldId, activeInput.value.trim() || editableFields.find(f => f.id === fieldId).value);
+                }
+            }
+            
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const currentTime = `${hours}:${minutes}`;
+            document.getElementById('timeField').textContent = currentTime;
+            editedFields['timeField'] = currentTime;
+            
+            applyAllChanges();
+            startTimer();
+        });
+        
+        function applyAllChanges() {
+            for (const [fieldId, value] of Object.entries(editedFields)) {
+                document.getElementById(fieldId).textContent = value;
+            }
+            
+            editedFields = {};
+            saveBtnContainer.style.display = 'none';
+            closeBtnContainer.style.display = 'block';
+        }
+        
+        function startTimer() {
+            validTimeEl.style.display = 'block';
+            
+            let seconds = 15;
+            const timer = setInterval(function() {
+                seconds--;
+                document.getElementById('validTime').textContent = seconds;
+                
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    tg.close();
+                }
+            }, 1000);
+        }
+        
+        closeBtn.addEventListener('click', function() {
+            tg.close();
+        });
+        
+        ticketTab.addEventListener('click', function() {
+            if (isAnyFieldEditing) return;
+            
+            ticketTab.classList.add('active');
+            controlTab.classList.remove('active');
+            ticketInfo.classList.add('active');
+            controlInfo.classList.remove('active');
+        });
+        
+        controlTab.addEventListener('click', function() {
+            if (isAnyFieldEditing) return;
+            
+            controlTab.classList.add('active');
+            ticketTab.classList.remove('active');
+            controlInfo.classList.add('active');
+            ticketInfo.classList.remove('active');
+        });
+        
+        document.querySelectorAll('.route-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                if (this.classList.contains('custom-route')) {
+                    routesPopup.style.display = 'none';
+                    
+                    const text = routeTitleField.textContent;
+                    routeTitleField.innerHTML = `<input class="edit-field" id="editInput_routeTitleField" value="${text}" autofocus>`;
+                    
+                    const input = document.getElementById('editInput_routeTitleField');
+                    input.focus();
+                    input.select();
+                    
+                    saveBtnContainer.style.display = 'block';
+                    closeBtnContainer.style.display = 'none';
+                } else {
+                    const routeText = this.getAttribute('data-route');
+                    const routeWithoutNumber = routeText.replace(/^\d+\s/, '');
+                    document.getElementById('routeTitleField').textContent = routeWithoutNumber;
+                    editedFields['routeTitleField'] = routeWithoutNumber;
+                    routesPopup.style.display = 'none';
+                    
+                    saveBtnContainer.style.display = 'block';
+                    closeBtnContainer.style.display = 'none';
+                }
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!routeSection.contains(e.target)) {
+                routesPopup.style.display = 'none';
+            }
+        });
+        
+        function loadFromLocalStorage() {
+            const savedUnlimited = localStorage.getItem(STORAGE_KEY);
+            
+            if (savedUnlimited === 'true') {
+                isUnlockMode = true;
+                unlimitedMode.style.display = 'block';
+                showTicketInterface();
+            }
+        }
+        
+        loadFromLocalStorage();
+    });
+</script>
+</body>
+</html>
