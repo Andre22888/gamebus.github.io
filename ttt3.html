@@ -1,12 +1,10 @@
-
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, maximum-scale=1">
-    <title>САЙТ НЕ ЯВЛЯЕТСЯ ОРИГИНАЛЬНЫМ ПРИОЛОЖЕНИЕМ, СДЕЛАН ИСКЛЮЧИТЕЛЬНО ДЛЯ ШУТКИ</title>
+    <title>САЙТ НЕ ЯВЛЯЕТСЯ ОРИГИНАЛЬНЫМ ПРИЛОЖЕНИЕМ, СДЕЛАН ИСКЛЮЧИТЕЛЬНО ДЛЯ ШУТКИ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         @font-face {
@@ -461,17 +459,11 @@
 </head>
 <body>
     <div class="password-screen" id="passwordScreen">
-        <div class="password-header">
-            Пароль можно купить в боте <span class="bot-link" id="botLink">@rhsbxueiwj9292msbot</span>
-        </div>
         <div class="password-container">
             <div class="password-label">Введите пароль:</div>
             <input type="tel" class="password-input" id="passwordInput" maxlength="6" inputmode="numeric" pattern="[0-9]*" autofocus>
             <div class="password-error" id="passwordError">Неверный пароль! Попробуйте снова.</div>
             <div class="unlimited-mode" id="unlimitedMode">Активирован безлимитный режим!</div>
-            
-            <!-- <div class="password-label" style="margin-top: 16px;">Количество доступных изменений:</div>
-            <input type="number" class="changes-input" id="changesInput" min="1" value="1"> -->
             
             <button class="submit-password-btn" id="submitPasswordBtn">ПОДТВЕРДИТЬ</button>
         </div>
@@ -583,273 +575,309 @@
     </div>
 
     <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
-
-    const TI2 = 345710;
-    const STORAGE_KEY = 'ticket_app_v2';
-
-    function dataEncrypt(input) {
-        return (input * 17 + 12345) % 1000000;
-    }
-
-    function dataDecrypt(encrypted) {
-        let temp = (encrypted - 12345) % 1000000;
-        if (temp < 0) temp += 1000000;
-        return (temp * 882353) % 1000000;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const accessScreen = document.getElementById('passwordScreen');
-        const ticketContainer = document.getElementById('ticketContainer');
-        const accessInput = document.getElementById('passwordInput');
-        const accessError = document.getElementById('passwordError');
-        const unlimitedMode = document.getElementById('unlimitedMode');
-        const submitAccessBtn = document.getElementById('submitPasswordBtn');
-        const botLink = document.getElementById('botLink');
-        
-        const closeBtn = document.getElementById('closeBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const ticketTab = document.getElementById('ticketTab');
-        const controlTab = document.getElementById('controlTab');
-        const ticketInfo = document.getElementById('ticketInfo');
-        const controlInfo = document.getElementById('controlInfo');
-        const saveBtnContainer = document.getElementById('saveBtnContainer');
-        const closeBtnContainer = document.getElementById('closeBtnContainer');
-        const validTimeEl = document.getElementById('validTimeEl');
-        const routesPopup = document.getElementById('routesPopup');
-        const routeTitleField = document.getElementById('routeTitleField');
-        const routeSection = document.getElementById('routeSection');
-        
-        botLink.addEventListener('click', function(e) {
+    (function(){
+        document.addEventListener('copy', function(e) {
             e.preventDefault();
-            window.open('http://t.me/rhsbxueiwj9292msbot', '_blank');
+            alert('Копирование запрещено!');
+            return false;
         });
         
-        const editableFields = [
-            { id: 'carrierField', value: 'КПАТП-5' },
-            { id: 'routeTitleField', value: '49 Крадиоцентр - Спорткомплекс "Радуга"' },
-            { id: 'routeField', value: 'н878ру124' },
-            { id: 'dateField', value: '3 апреля 2025 г.' },
-            { id: 'timeField', value: '10:06' }
-        ];
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
         
-        let editedFields = {};
-        let isAnyFieldEditing = false;
-        let isUnlockMode = false;
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 74) || 
+                (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        setInterval(function() {
+            if (window.outerHeight - window.innerHeight > 200 || 
+                window.outerWidth - window.innerWidth > 200) {
+                document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:50px;">Обнаружены инструменты разработчика!</h1>';
+                window.location.reload();
+            }
+        }, 1000);
 
-        accessInput.focus();
+        var _0x3d5a = ['345710', 'ticket_app_v2', 'true', 'Пароль можно купить в боте ', 'Неверный пароль! Попробуйте снова.', 'Активирован безлимитный режим!', 'http://t.me/rhsbxueiwj9292msbot', 'Действует: ', ' сек.', 'КПАТП-5', '49 Крадиоцентр - Спорткомплекс "Радуга"', 'н878ру124', '3 апреля 2025 г.', '10:06', '1 шт., Полный, 60.00 ₽'];
+        var _0x2b8a = function(_0x4c9d3d, _0x2b8a5f) {
+            _0x4c9d3d = _0x4c9d3d - 0x0;
+            var _0x3d5a4c = _0x3d5a[_0x4c9d3d];
+            return _0x3d5a4c;
+        };
         
-        accessInput.addEventListener('input', function() {
-            this.value = this.value.replace(/\D/g, '');
-            accessError.style.display = 'none';
-        });
+        var tg = window.Telegram.WebApp;
+        tg.expand();
         
-        submitAccessBtn.addEventListener('click', function() {
-            const enteredCode = parseInt(accessInput.value);
-            if (isNaN(enteredCode)) {
-                accessError.style.display = 'block';
-                accessInput.value = '';
-                accessInput.focus();
-                return;
-            }
-
-            if (dataEncrypt(enteredCode) === TI2) {
-                isUnlockMode = true;
-                unlimitedMode.style.display = 'block';
-                localStorage.setItem(STORAGE_KEY, 'true');
-                showTicketInterface();
-            } else {
-                accessError.style.display = 'block';
-                accessInput.value = '';
-                accessInput.focus();
-            }
-        });
-        
-        accessInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitAccessBtn.click();
-            }
-        });
-        
-        function showTicketInterface() {
-            accessScreen.style.display = 'none';
-            ticketContainer.style.display = 'block';
+        function _0x1a2b(_0x3d5a4c) {
+            return (_0x3d5a4c * 0x11 + 0x3039) % 0xf4240;
         }
         
-        editableFields.forEach(field => {
-            const element = document.getElementById(field.id);
+        function _0x4e7d(_0x1a2b6f) {
+            var _0x4e7d8a = (_0x1a2b6f - 0x3039) % 0xf4240;
+            if (_0x4e7d8a < 0x0) _0x4e7d8a += 0xf4240;
+            return (_0x4e7d8a * 0xd75e1) % 0xf4240;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            var _0x5a8b2c = document.getElementById('passwordScreen');
+            var _0x3e7f4a = document.getElementById('ticketContainer');
+            var _0x4d29b6 = document.getElementById('passwordInput');
+            var _0x2f6c1e = document.getElementById('passwordError');
+            var _0x5c82d3 = document.getElementById('unlimitedMode');
+            var _0x1e7f8d = document.getElementById('submitPasswordBtn');
+            var _0x3a9b5f = document.getElementById('botLink');
+            var _0x5e6f7a = document.getElementById('closeBtn');
+            var _0x2c8e9d = document.getElementById('saveBtn');
+            var _0x4a3b8f = document.getElementById('ticketTab');
+            var _0x3f6c1a = document.getElementById('controlTab');
+            var _0x2d4e7c = document.getElementById('ticketInfo');
+            var _0x5b9e2a = document.getElementById('controlInfo');
+            var _0x3b6c4d = document.getElementById('saveBtnContainer');
+            var _0x4f2c7e = document.getElementById('closeBtnContainer');
+            var _0x5d9a3f = document.getElementById('validTimeEl');
+            var _0x1c8e6d = document.getElementById('routesPopup');
+            var _0x3e9f5a = document.getElementById('routeTitleField');
+            var _0x2a7b4c = document.getElementById('routeSection');
             
-            element.addEventListener('click', function(e) {
-                if (field.id === 'routeTitleField') {
-                    if (routesPopup.style.display === 'block') {
-                        routesPopup.style.display = 'none';
-                        return;
-                    }
-                    
-                    routesPopup.style.display = 'block';
-                    e.stopPropagation();
+            _0x5a8b2c.style.display = 'flex';
+            
+            _0x3a9b5f.addEventListener('click', function(_0x3c8e9f) {
+                _0x3c8e9f.preventDefault();
+                window.open(_0x2b8a('0x6'), '_blank');
+            });
+            
+            var _0x4b2c7d = [
+                { id: 'carrierField', value: _0x2b8a('0x9') },
+                { id: 'routeTitleField', value: _0x2b8a('0xa') },
+                { id: 'routeField', value: _0x2b8a('0xb') },
+                { id: 'dateField', value: _0x2b8a('0xc') },
+                { id: 'timeField', value: _0x2b8a('0xd') }
+            ];
+            
+            var _0x2e6f8a = {};
+            var _0x5d3c9e = false;
+            var _0x4a8b2c = false;
+            
+            _0x4d29b6.focus();
+            
+            _0x4d29b6.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+                _0x2f6c1e.style.display = 'none';
+            });
+            
+            _0x1e7f8d.addEventListener('click', function() {
+                var _0x5e8f3a = parseInt(_0x4d29b6.value);
+                if (isNaN(_0x5e8f3a)) {
+                    _0x2f6c1e.style.display = 'block';
+                    _0x4d29b6.value = '';
+                    _0x4d29b6.focus();
                     return;
                 }
                 
-                if (isAnyFieldEditing) return;
+                if (_0x1a2b(_0x5e8f3a) === parseInt(_0x2b8a('0x0'))) {
+                    _0x4a8b2c = true;
+                    _0x5c82d3.style.display = 'block';
+                    localStorage.setItem(_0x2b8a('0x1'), _0x2b8a('0x2'));
+                    _0x3c8e9f();
+                } else {
+                    _0x2f6c1e.style.display = 'block';
+                    _0x4d29b6.value = '';
+                    _0x4d29b6.focus();
+                }
+            });
+            
+            _0x4d29b6.addEventListener('keypress', function(_0x2a7b4c) {
+                if (_0x2a7b4c.key === 'Enter') {
+                    _0x1e7f8d.click();
+                }
+            });
+            
+            function _0x3c8e9f() {
+                _0x5a8b2c.style.display = 'none';
+                _0x3e7f4a.style.display = 'block';
+            }
+            
+            _0x4b2c7d.forEach(function(_0x2d4e7c) {
+                var _0x5b9e2a = document.getElementById(_0x2d4e7c.id);
                 
-                isAnyFieldEditing = true;
+                _0x5b9e2a.addEventListener('click', function(_0x3b6c4d) {
+                    if (_0x2d4e7c.id === 'routeTitleField') {
+                        if (_0x1c8e6d.style.display === 'block') {
+                            _0x1c8e6d.style.display = 'none';
+                            return;
+                        }
+                        
+                        _0x1c8e6d.style.display = 'block';
+                        _0x3b6c4d.stopPropagation();
+                        return;
+                    }
+                    
+                    if (_0x5d3c9e) return;
+                    
+                    _0x5d3c9e = true;
+                    
+                    var _0x4f2c7e = _0x5b9e2a.textContent;
+                    _0x5b9e2a.innerHTML = '<input class="edit-field" id="editInput_' + _0x2d4e7c.id + '" value="' + _0x4f2c7e + '" autofocus>';
+                    
+                    var _0x5d9a3f = document.getElementById('editInput_' + _0x2d4e7c.id);
+                    _0x5d9a3f.focus();
+                    _0x5d9a3f.select();
+                    
+                    _0x3b6c4d.style.display = 'block';
+                    _0x4f2c7e.style.display = 'none';
+                    
+                    _0x5d9a3f.addEventListener('keypress', function(_0x1c8e6d) {
+                        if (_0x1c8e6d.key === 'Enter') {
+                            _0x3e9f5a(_0x2d4e7c.id, _0x5d9a3f.value.trim() || _0x2d4e7c.value);
+                            _0x2a7b4c(_0x2d4e7c.id);
+                        }
+                    });
+                    
+                    _0x5d9a3f.addEventListener('blur', function() {
+                        _0x3e9f5a(_0x2d4e7c.id, _0x5d9a3f.value.trim() || _0x2d4e7c.value);
+                    });
+                });
+            });
+            
+            function _0x3e9f5a(_0x5e6f7a, _0x2c8e9d) {
+                if (!_0x5d3c9e && _0x5e6f7a !== 'routeTitleField') return;
                 
-                const text = element.textContent;
-                element.innerHTML = `<input class="edit-field" id="editInput_${field.id}" value="${text}" autofocus>`;
+                _0x2e6f8a[_0x5e6f7a] = _0x2c8e9d;
+                document.getElementById(_0x5e6f7a).textContent = _0x2c8e9d;
                 
-                const input = document.getElementById(`editInput_${field.id}`);
-                input.focus();
-                input.select();
+                _0x5d3c9e = false;
+            }
+            
+            function _0x2a7b4c(_0x3f6c1a) {
+                var _0x2d4e7c = _0x4b2c7d.findIndex(function(_0x5b9e2a) { return _0x5b9e2a.id === _0x3f6c1a; });
+                if (_0x2d4e7c < _0x4b2c7d.length - 0x1) {
+                    var _0x3b6c4d = _0x4b2c7d[_0x2d4e7c + 0x1].id;
+                    document.getElementById(_0x3b6c4d).click();
+                }
+            }
+            
+            _0x2c8e9d.addEventListener('click', function() {
+                if (_0x5d3c9e) {
+                    var _0x4f2c7e = document.querySelector('input.edit-field');
+                    if (_0x4f2c7e) {
+                        var _0x5d9a3f = _0x4f2c7e.id.replace('editInput_', '');
+                        _0x3e9f5a(_0x5d9a3f, _0x4f2c7e.value.trim() || _0x4b2c7d.find(function(_0x1c8e6d) { return _0x1c8e6d.id === _0x5d9a3f; }).value);
+                    }
+                }
                 
-                saveBtnContainer.style.display = 'block';
-                closeBtnContainer.style.display = 'none';
+                var _0x3e9f5a = new Date();
+                var _0x2a7b4c = _0x3e9f5a.getHours().toString().padStart(0x2, '0');
+                var _0x5e6f7a = _0x3e9f5a.getMinutes().toString().padStart(0x2, '0');
+                var _0x2c8e9d = _0x2a7b4c + ':' + _0x5e6f7a;
+                document.getElementById('timeField').textContent = _0x2c8e9d;
+                _0x2e6f8a['timeField'] = _0x2c8e9d;
                 
-                input.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        finishEditing(field.id, input.value.trim() || field.value);
-                        moveToNextField(field.id);
+                _0x4a3b8f();
+                _0x3f6c1a();
+            });
+            
+            function _0x4a3b8f() {
+                for (var _0x2d4e7c in _0x2e6f8a) {
+                    document.getElementById(_0x2d4e7c).textContent = _0x2e6f8a[_0x2d4e7c];
+                }
+                
+                _0x2e6f8a = {};
+                _0x3b6c4d.style.display = 'none';
+                _0x4f2c7e.style.display = 'block';
+            }
+            
+            function _0x3f6c1a() {
+                _0x5d9a3f.style.display = 'block';
+                
+                var _0x5b9e2a = 0xf;
+                var _0x3b6c4d = setInterval(function() {
+                    _0x5b9e2a--;
+                    document.getElementById('validTime').textContent = _0x5b9e2a;
+                    
+                    if (_0x5b9e2a <= 0x0) {
+                        clearInterval(_0x3b6c4d);
+                        tg.close();
+                    }
+                }, 0x3e8);
+            }
+            
+            _0x5e6f7a.addEventListener('click', function() {
+                tg.close();
+            });
+            
+            _0x4a3b8f.addEventListener('click', function() {
+                if (_0x5d3c9e) return;
+                
+                _0x4a3b8f.classList.add('active');
+                _0x3f6c1a.classList.remove('active');
+                _0x2d4e7c.classList.add('active');
+                _0x5b9e2a.classList.remove('active');
+            });
+            
+            _0x3f6c1a.addEventListener('click', function() {
+                if (_0x5d3c9e) return;
+                
+                _0x3f6c1a.classList.add('active');
+                _0x4a3b8f.classList.remove('active');
+                _0x5b9e2a.classList.add('active');
+                _0x2d4e7c.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.route-item').forEach(function(_0x2d4e7c) {
+                _0x2d4e7c.addEventListener('click', function(_0x5b9e2a) {
+                    _0x5b9e2a.stopPropagation();
+                    
+                    if (this.classList.contains('custom-route')) {
+                        _0x1c8e6d.style.display = 'none';
+                        
+                        var _0x3b6c4d = _0x3e9f5a.textContent;
+                        _0x3e9f5a.innerHTML = '<input class="edit-field" id="editInput_routeTitleField" value="' + _0x3b6c4d + '" autofocus>';
+                        
+                        var _0x4f2c7e = document.getElementById('editInput_routeTitleField');
+                        _0x4f2c7e.focus();
+                        _0x4f2c7e.select();
+                        
+                        _0x3b6c4d.style.display = 'block';
+                        _0x4f2c7e.style.display = 'none';
+                    } else {
+                        var _0x5d9a3f = this.getAttribute('data-route');
+                        var _0x1c8e6d = _0x5d9a3f.replace(/^\d+\s/, '');
+                        document.getElementById('routeTitleField').textContent = _0x1c8e6d;
+                        _0x2e6f8a['routeTitleField'] = _0x1c8e6d;
+                        _0x1c8e6d.style.display = 'none';
+                        
+                        _0x3b6c4d.style.display = 'block';
+                        _0x4f2c7e.style.display = 'none';
                     }
                 });
-                
-                input.addEventListener('blur', function() {
-                    finishEditing(field.id, input.value.trim() || field.value);
-                });
             });
-        });
-        
-        function finishEditing(fieldId, value) {
-            if (!isAnyFieldEditing && fieldId !== 'routeTitleField') return;
             
-            editedFields[fieldId] = value;
-            document.getElementById(fieldId).textContent = value;
-            
-            isAnyFieldEditing = false;
-        }
-        
-        function moveToNextField(currentFieldId) {
-            const currentIndex = editableFields.findIndex(f => f.id === currentFieldId);
-            if (currentIndex < editableFields.length - 1) {
-                const nextFieldId = editableFields[currentIndex + 1].id;
-                document.getElementById(nextFieldId).click();
-            }
-        }
-        
-        saveBtn.addEventListener('click', function() {
-            if (isAnyFieldEditing) {
-                const activeInput = document.querySelector('input.edit-field');
-                if (activeInput) {
-                    const fieldId = activeInput.id.replace('editInput_', '');
-                    finishEditing(fieldId, activeInput.value.trim() || editableFields.find(f => f.id === fieldId).value);
-                }
-            }
-            
-            const now = new Date();
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            const currentTime = `${hours}:${minutes}`;
-            document.getElementById('timeField').textContent = currentTime;
-            editedFields['timeField'] = currentTime;
-            
-            applyAllChanges();
-            startTimer();
-        });
-        
-        function applyAllChanges() {
-            for (const [fieldId, value] of Object.entries(editedFields)) {
-                document.getElementById(fieldId).textContent = value;
-            }
-            
-            editedFields = {};
-            saveBtnContainer.style.display = 'none';
-            closeBtnContainer.style.display = 'block';
-        }
-        
-        function startTimer() {
-            validTimeEl.style.display = 'block';
-            
-            let seconds = 15;
-            const timer = setInterval(function() {
-                seconds--;
-                document.getElementById('validTime').textContent = seconds;
-                
-                if (seconds <= 0) {
-                    clearInterval(timer);
-                    tg.close();
-                }
-            }, 1000);
-        }
-        
-        closeBtn.addEventListener('click', function() {
-            tg.close();
-        });
-        
-        ticketTab.addEventListener('click', function() {
-            if (isAnyFieldEditing) return;
-            
-            ticketTab.classList.add('active');
-            controlTab.classList.remove('active');
-            ticketInfo.classList.add('active');
-            controlInfo.classList.remove('active');
-        });
-        
-        controlTab.addEventListener('click', function() {
-            if (isAnyFieldEditing) return;
-            
-            controlTab.classList.add('active');
-            ticketTab.classList.remove('active');
-            controlInfo.classList.add('active');
-            ticketInfo.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.route-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.stopPropagation();
-                
-                if (this.classList.contains('custom-route')) {
-                    routesPopup.style.display = 'none';
-                    
-                    const text = routeTitleField.textContent;
-                    routeTitleField.innerHTML = `<input class="edit-field" id="editInput_routeTitleField" value="${text}" autofocus>`;
-                    
-                    const input = document.getElementById('editInput_routeTitleField');
-                    input.focus();
-                    input.select();
-                    
-                    saveBtnContainer.style.display = 'block';
-                    closeBtnContainer.style.display = 'none';
-                } else {
-                    const routeText = this.getAttribute('data-route');
-                    const routeWithoutNumber = routeText.replace(/^\d+\s/, '');
-                    document.getElementById('routeTitleField').textContent = routeWithoutNumber;
-                    editedFields['routeTitleField'] = routeWithoutNumber;
-                    routesPopup.style.display = 'none';
-                    
-                    saveBtnContainer.style.display = 'block';
-                    closeBtnContainer.style.display = 'none';
+            document.addEventListener('click', function(_0x3e9f5a) {
+                if (!_0x2a7b4c.contains(_0x3e9f5a.target)) {
+                    _0x1c8e6d.style.display = 'none';
                 }
             });
-        });
-        
-        document.addEventListener('click', function(e) {
-            if (!routeSection.contains(e.target)) {
-                routesPopup.style.display = 'none';
-            }
-        });
-        
-        function loadFromLocalStorage() {
-            const savedUnlimited = localStorage.getItem(STORAGE_KEY);
             
-            if (savedUnlimited === 'true') {
-                isUnlockMode = true;
-                unlimitedMode.style.display = 'block';
-                showTicketInterface();
+            function _0x2a7b4c() {
+                var _0x5e6f7a = localStorage.getItem(_0x2b8a('0x1'));
+                
+                if (_0x5e6f7a === _0x2b8a('0x2')) {
+                    _0x4a8b2c = true;
+                    _0x5c82d3.style.display = 'block';
+                    _0x3c8e9f();
+                }
             }
-        }
-        
-        loadFromLocalStorage();
-    });
-</script>
+            
+            _0x2a7b4c();
+        });
+    })();
+    </script>
 </body>
 </html>
