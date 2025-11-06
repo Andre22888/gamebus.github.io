@@ -234,154 +234,194 @@
     </style>
 
 <script>
-        function parseTicketDataFromURL() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const ticketDataParam = urlParams.get('ticket_data');
-            
-            if (ticketDataParam) {
-                try {
-                    const decodedData = decodeURIComponent(ticketDataParam);
-                    const ticketData = JSON.parse(decodedData);
-                    console.log('Parsed ticket data:', ticketData);
-                    return ticketData;
-                } catch (e) {
-                    console.error('Error parsing ticket data:', e);
-                }
+    function parseTicketDataFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketDataParam = urlParams.get('ticket_data');
+        
+        console.log('Raw ticket_data param:', ticketDataParam);
+        
+        if (ticketDataParam) {
+            try {
+                const decodedData = decodeURIComponent(ticketDataParam);
+                console.log('Decoded data:', decodedData);
+                
+                const ticketData = JSON.parse(decodedData);
+                console.log('Parsed ticket data:', ticketData);
+                return ticketData;
+            } catch (e) {
+                console.error('Error parsing ticket data:', e);
+                showError(`Ошибка парсинга данных: ${e.message}. Данные: ${ticketDataParam}`);
+                return null;
             }
-            return null;
         }
+        return null;
+    }
 
-        function updateTicketInterface(ticketData) {
-            console.log('Updating interface with:', ticketData);
-            
+    function showError(message) {
+        document.getElementById('timer').textContent = 'Ошибка загрузки';
+        document.getElementById('ticketContainer').innerHTML = 
+            `<div class="error-message">${message}</div>`;
+    }
+
+    function updateTicketInterface(ticketData) {
+        console.log('Updating interface with:', ticketData);
+        
+        try {
             if (ticketData.carrier) {
                 document.getElementById('carrierName').textContent = ticketData.carrier;
+            } else {
+                document.getElementById('carrierName').textContent = 'КПАТП-7'; // значение по умолчанию
             }
+            
             if (ticketData.route) {
                 document.getElementById('routeInfo').textContent = ticketData.route;
+            } else {
+                document.getElementById('routeInfo').textContent = 'пос. Водников-Железнодорожный - вокзал';
             }
+            
             if (ticketData.transport) {
                 document.getElementById('transportNumber').textContent = ticketData.transport;
+            } else {
+                document.getElementById('transportNumber').textContent = 'в774те124';
             }
+            
             if (ticketData.tariff) {
-                document.getElementById('tariff').textContent = `1 шт., ${ticketData.tariff}`;
+                document.getElementById('tariff').textContent = ticketData.tariff;
+            } else {
+                document.getElementById('tariff').textContent = '1 шт., Полный, 48.00 ₽';
             }
+            
             if (ticketData.ticket_number) {
                 document.getElementById('ticket').textContent = ticketData.ticket_number;
                 document.getElementById('ticket1').textContent = `№ ${ticketData.ticket_number}`;
+            } else {
+                const defaultTicket = '1 281 208 939';
+                document.getElementById('ticket').textContent = defaultTicket;
+                document.getElementById('ticket1').textContent = `№ ${defaultTicket}`;
             }
             
             startTimer();
+            
+        } catch (e) {
+            console.error('Error updating interface:', e);
+            showError(`Ошибка обновления интерфейса: ${e.message}`);
         }
+    }
 
-        function startTimer() {
-            const timerElement = document.getElementById('timer');
-            let timeLeft = 15;
+    function startTimer() {
+        const timerElement = document.getElementById('timer');
+        let timeLeft = 15;
 
-            function updateTimer() {
-                timerElement.textContent = `Действует: ${timeLeft} сек.`;
-                if (timeLeft > 0) {
-                    timeLeft--;
-                    setTimeout(updateTimer, 1000);
-                } else {
-                    if (window.Telegram && Telegram.WebApp) {
-                        Telegram.WebApp.close();
-                    }
+        function updateTimer() {
+            timerElement.textContent = `Действует: ${timeLeft} сек.`;
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                if (window.Telegram && Telegram.WebApp) {
+                    Telegram.WebApp.close();
                 }
             }
-
-            updateTimer();
         }
 
-        function initApp() {
-            console.log('Initializing app...');
+        updateTimer();
+    }
 
-            const ticketData = parseTicketDataFromURL();
+    function initApp() {
+        console.log('Initializing app...');
+        console.log('URL search params:', window.location.search);
+
+        const ticketData = parseTicketDataFromURL();
+        
+        if (ticketData) {
+            updateTicketInterface(ticketData);
+        } else {
+            console.log('No valid ticket data found');
+            const demoData = {
+                carrier: 'КПАТП-7',
+                route: 'пос. Водников-Железнодорожный - вокзал',
+                transport: 'в774те124',
+                tariff: '1 шт., Полный, 48.00 ₽',
+                ticket_number: '1 281 208 939',
+                expiry_time: '12:04'
+            };
+            updateTicketInterface(demoData);
+        }
+
+        let tg = window.Telegram.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.MainButton.show();
+            tg.MainButton.enable();
+            tg.MainButton.text = "ЗАКРЫТЬ";
+            tg.MainButton.setText("ЗАКРЫТЬ");
+            tg.MainButton.textColor = "#f1f5f9";
+            tg.MainButton.color = "#ff0018";
+            tg.MainButton.setParams({ "color": "#ff0018" });
             
-            if (ticketData) {
-                updateTicketInterface(ticketData);
-            } else {
-                console.log('No ticket data found');
-                document.getElementById('timer').textContent = 'Ошибка загрузки билета';
-                document.getElementById('ticketContainer').innerHTML = 
-                    '<div class="error-message">Не удалось загрузить данные билета. Пожалуйста, попробуйте снова.</div>';
-            }
-
-            let tg = window.Telegram.WebApp;
-            if (tg) {
-                tg.expand();
-                tg.MainButton.show();
-                tg.MainButton.enable();
-                tg.MainButton.text = "ЗАКРЫТЬ";
-                tg.MainButton.setText("ЗАКРЫТЬ");
-                tg.MainButton.textColor = "#f1f5f9";
-                tg.MainButton.color = "#ff0018";
-                tg.MainButton.setParams({ "color": "#ff0018" });
-                
-                Telegram.WebApp.onEvent('mainButtonClicked', function () {
-                    tg.close();
-                });
-            }
-
-            setCurrentDateTime();
+            Telegram.WebApp.onEvent('mainButtonClicked', function () {
+                tg.close();
+            });
         }
 
-        function setCurrentDateTime() {
-            var currentTime = new Date();
-            var hours = currentTime.getHours();
-            var minutes = currentTime.getMinutes();
-            hours = (hours < 10 ? '0' : '') + hours;
-            minutes = (minutes < 10 ? '0' : '') + minutes;
-            var formattedTime = hours + ':' + minutes;
-            var currentTimeElement = document.getElementById('currentTime');
-            if (currentTimeElement) {
-                currentTimeElement.innerText = formattedTime;
-            }
+        setCurrentDateTime();
+    }
 
-            var currentDate = new Date();
-            var day = currentDate.getDate();
-            var month = currentDate.getMonth();
-            var year = currentDate.getFullYear();
-            var monthNames = ["января", "февраля", "марта", "апреля", "мая", "июня",
-                "июля", "августа", "сентября", "октября", "ноября", "декабря"];
-            day = (day < 10 ? '0' : '') + day;
-            var formattedDate = day + ' ' + monthNames[month] + ' ' + year + ' г.';
-            var purchaseDateElement = document.getElementById('purchaseDate');
-            if (purchaseDateElement) {
-                purchaseDateElement.innerText = formattedDate;
-            }
+    function setCurrentDateTime() {
+        var currentTime = new Date();
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        hours = (hours < 10 ? '0' : '') + hours;
+        minutes = (minutes < 10 ? '0' : '') + minutes;
+        var formattedTime = hours + ':' + minutes;
+        var currentTimeElement = document.getElementById('currentTime');
+        if (currentTimeElement) {
+            currentTimeElement.innerText = formattedTime;
         }
 
-        document.getElementById("kontrol").addEventListener("click", function (e) {
-            const mainSectElement = document.querySelector(".main-sect");
-            const qrBox = document.querySelector('.qr-box');
-            const ticketInfoAfter = document.querySelector(".ticket-info");
-            ticketInfoAfter.style.setProperty('--red-line', "160px")
-            ticketInfoAfter.style.setProperty('--center-x', "10%")
-            document.getElementById("bilet").style.color = "black"
-            e.target.style.color = "red";
-            mainSectElement.style.display = "none";
-            qrBox.style.display = "initial";
-        });
+        var currentDate = new Date();
+        var day = currentDate.getDate();
+        var month = currentDate.getMonth();
+        var year = currentDate.getFullYear();
+        var monthNames = ["января", "февраля", "марта", "апреля", "мая", "июня",
+            "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+        day = (day < 10 ? '0' : '') + day;
+        var formattedDate = day + ' ' + monthNames[month] + ' ' + year + ' г.';
+        var purchaseDateElement = document.getElementById('purchaseDate');
+        if (purchaseDateElement) {
+            purchaseDateElement.innerText = formattedDate;
+        }
+    }
 
-        document.getElementById("bilet").addEventListener("click", function (e) {
-            const mainSectElement = document.querySelector(".main-sect");
-            const qrBox = document.querySelector('.qr-box');
-            const ticketInfoAfter = document.querySelector(".ticket-info");
-            e.target.style.color = "red";
-            document.getElementById("kontrol").style.color = "black"
-            ticketInfoAfter.style.setProperty('--red-line', "120px")
-            ticketInfoAfter.style.setProperty('--center-x', "-180%");
-            ticketInfoAfter.style.setProperty('--procent-pos', "69.5%")
-            qrBox.style.display = "none";
-            mainSectElement.style.display = "initial";
-        });
+    document.getElementById("kontrol").addEventListener("click", function (e) {
+        const mainSectElement = document.querySelector(".main-sect");
+        const qrBox = document.querySelector('.qr-box');
+        const ticketInfoAfter = document.querySelector(".ticket-info");
+        ticketInfoAfter.style.setProperty('--red-line', "160px")
+        ticketInfoAfter.style.setProperty('--center-x', "10%")
+        document.getElementById("bilet").style.color = "black"
+        e.target.style.color = "red";
+        mainSectElement.style.display = "none";
+        qrBox.style.display = "initial";
+    });
 
-        document.addEventListener('DOMContentLoaded', function() {
-            initApp();
-        });
+    document.getElementById("bilet").addEventListener("click", function (e) {
+        const mainSectElement = document.querySelector(".main-sect");
+        const qrBox = document.querySelector('.qr-box');
+        const ticketInfoAfter = document.querySelector(".ticket-info");
+        e.target.style.color = "red";
+        document.getElementById("kontrol").style.color = "black"
+        ticketInfoAfter.style.setProperty('--red-line', "120px")
+        ticketInfoAfter.style.setProperty('--center-x', "-180%");
+        ticketInfoAfter.style.setProperty('--procent-pos', "69.5%")
+        qrBox.style.display = "none";
+        mainSectElement.style.display = "initial";
+    });
 
-    </script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initApp();
+    });
+</script>
 
     <script src="https://kit.fontawesome.com/bae6f8df00.js" crossorigin="anonymous"></script>
 </body>
