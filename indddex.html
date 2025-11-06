@@ -34,6 +34,110 @@
         text-align: center;
         padding: 20px;
     }
+
+    .ticket-info {
+        position: relative;
+        padding-bottom: 2px;
+    }
+
+    .red-line {
+        position: absolute;
+        bottom: 0;
+        height: 2px;
+        background-color: red;
+        transition: all 0.3s ease;
+        width: 100px;
+    }
+
+    .ticket-actions {
+        position: relative;
+        z-index: 1;
+    }
+
+    #bilet.active, #kontrol.active {
+        color: red;
+    }
+
+    #bilet:not(.active), #kontrol:not(.active) {
+        color: var(--tg-theme-text-color);
+    }
+
+    #bilet, #kontrol {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    #bilet:hover, #kontrol:hover {
+        background-color: var(--tg-theme-secondary-bg-color, #f0f0f000);
+    }
+
+    .qr-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .qr-background {
+        background: rgb(255, 255, 255);
+        padding: 15px;
+        /* border-radius: 12px; */
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        /* margin-bottom: 15px; */
+    }
+
+    .qr-image {
+        width: 280px;
+        height: 280px;
+        display: block;
+    }
+
+    body {
+        color: var(--tg-theme-text-color);
+        background: var(--tg-theme-bg-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 17px;
+        padding-bottom: 60px;
+    }
+
+    .hint {
+        color: var(--tg-theme-hint-color);
+    }
+
+    .link {
+        color: var(--tg-theme-link-color);
+    }
+
+    .btn-danger {
+        background-color: #f4041b;
+    }
+
+    .svg-inline--fa {
+        overflow: visible;
+        box-sizing: content-box;
+    }
+
+    .svg-inline--fa {
+        display: var(--fa-display, inline-block);
+        height: 1em;
+        overflow: visible;
+        vertical-align: -0.125em;
+    }
+
+    hr {
+        opacity: 0.2;
+        filter: blur(1px);
+    }
 </style>
 
 <body>
@@ -42,7 +146,7 @@
         <div class="ticket-info pb-0" style="border-bottom: 1px silver solid;">
             <h2 id="timer">Действует: 15 сек.</h2>
             <div class="ticket-actions d-inline-flex mt-3 mb-1 justify-content-around">
-                <div class=" me-4 mb-2 " style="text-align: right; color: red; cursor: pointer; margin-left: 20px;" id="bilet">
+                <div class="me-4 mb-2" style="text-align: right; cursor: pointer; margin-left: 20px;" id="bilet">
                     <fa-icon size="small" class="ng-fa-icon ng-star-inserted me-1"><svg role="img" aria-hidden="true"
                             focusable="false" data-prefix="far" data-icon="memo-circle-check"
                             class="svg-inline--fa fa-memo-circle-check fa-lg" xmlns="http://www.w3.org/2000/svg"
@@ -53,14 +157,7 @@
                         </svg></fa-icon>
                     <div class="ticket" id="ticket"></div>
                 </div>
-                <div id="qrCodeContainer" style="display: none;">
-                    <a href="http://qrcoder.ru" target="_blank">
-                        <img src="http://qrcoder.ru/code/?qr+%EA%EE%E4+%EF%EE%EA%E0+%E2+%EE%E1%F0%E0%E1%EE%F2%EA%E5&4&0"
-                            width="148" height="148" border="0" title="QR код">
-                    </a>
-                    <div id="qrTicketNumber" style="margin-top: 10px; font-size: 16px;"></div>
-                </div>
-                <div class=" mb-2 " style="text-align: left; cursor: pointer; margin-left: 20px;" id="kontrol">
+                <div class="mb-2" style="text-align: left; cursor: pointer; margin-left: 20px;" id="kontrol">
                     <fa-icon size="small" class="ng-fa-icon ng-star-inserted me-1"><svg role="img" aria-hidden="true"
                             focusable="false" data-prefix="far" data-icon="user-pilot"
                             class="svg-inline--fa fa-user-pilot fa-lg" xmlns="http://www.w3.org/2000/svg"
@@ -71,13 +168,17 @@
                         </svg></fa-icon> Контроль
                 </div>
             </div>
+            <div class="red-line" id="redLine"></div>
         </div>
         <br>
         <div class="qr-box" style="display: none;">
-            <img style="width: 90%; height: 90%;"
-                src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
-                alt="">
-             <div class="ticket1" id="ticket1"></div>
+            <div class="qr-container">
+                <div class="qr-background">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" 
+                         alt="QR Code" class="qr-image">
+                </div>
+                <div class="ticket1" id="ticket1"></div>
+            </div>
         </div>
         <div class="main-sect" style="display: initial;">
             <div class="carrier-info row mt-2">
@@ -174,65 +275,6 @@
         </div>
     </div>
 
-    <style>
-        body {
-            color: var(--tg-theme-text-color);
-            background: var(--tg-theme-bg-color);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 17px;
-            padding-bottom: 60px; 
-        }
-
-        .hint {
-            color: var(--tg-theme-hint-color);
-        }
-
-        .link {
-            color: var(--tg-theme-link-color);
-        }
-
-        .btn-danger {
-            background-color: #f4041b;
-        }
-
-        .ticket-info {
-            position: relative;
-            --red-line: 150px;
-            --procent-pos: 55%;
-            --center-x: -92%;
-        }
-
-        .ticket-info::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: var(--procent-pos);
-            transform: translateX(var(--center-x));
-            width: var(--red-line);
-            height: 2px;
-            background-color: red;
-        }
-
-        .svg-inline--fa {
-            overflow: visible;
-            box-sizing: content-box;
-        }
-
-        .svg-inline--fa {
-            display: var(--fa-display, inline-block);
-            height: 1em;
-            overflow: visible;
-            vertical-align: -0.125em;
-        }
-
-        hr {
-            opacity: 0.2;
-            filter: blur(1px);
-        }
-    </style>
-
 <script>
     function parseTicketDataFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
@@ -270,7 +312,7 @@
             if (ticketData.carrier) {
                 document.getElementById('carrierName').textContent = ticketData.carrier;
             } else {
-                document.getElementById('carrierName').textContent = 'КПАТП-7'; // значение по умолчанию
+                document.getElementById('carrierName').textContent = 'КПАТП-7';
             }
             
             if (ticketData.route) {
@@ -300,6 +342,13 @@
                 document.getElementById('ticket1').textContent = `№ ${defaultTicket}`;
             }
             
+            setTimeout(() => {
+                const activeTab = document.querySelector('#bilet.active, #kontrol.active');
+                if (activeTab) {
+                    updateRedLine(activeTab);
+                }
+            }, 100);
+            
             startTimer();
             
         } catch (e) {
@@ -327,9 +376,55 @@
         updateTimer();
     }
 
+    function updateRedLine(activeElement) {
+        const redLine = document.getElementById('redLine');
+        if (!redLine || !activeElement) return;
+
+        const rect = activeElement.getBoundingClientRect();
+        const parentRect = activeElement.parentElement.getBoundingClientRect();
+        
+        const elementCenter = rect.left - parentRect.left + rect.width / 2;
+        
+        redLine.style.width = `${rect.width * 0.8}px`;
+        redLine.style.left = `${elementCenter - (rect.width * 0.8) / 2}px`;
+    }
+
+    function setActiveTab(tabId) {
+        document.getElementById('bilet').classList.remove('active');
+        document.getElementById('kontrol').classList.remove('active');
+        
+        const mainSectElement = document.querySelector(".main-sect");
+        const qrBox = document.querySelector('.qr-box');
+        
+        if (tabId === 'bilet') {
+            document.getElementById('bilet').classList.add('active');
+            mainSectElement.style.display = "initial";
+            qrBox.style.display = "none";
+        } else {
+            document.getElementById('kontrol').classList.add('active');
+            mainSectElement.style.display = "none";
+            qrBox.style.display = "block";
+        }
+        
+        updateRedLine(document.getElementById(tabId));
+    }
+
+    function initRedLine() {
+        setActiveTab('bilet');
+        
+        window.addEventListener('resize', function() {
+            const activeTab = document.querySelector('#bilet.active, #kontrol.active');
+            if (activeTab) {
+                updateRedLine(activeTab);
+            }
+        });
+    }
+
     function initApp() {
         console.log('Initializing app...');
         console.log('URL search params:', window.location.search);
+
+        initRedLine();
 
         const ticketData = parseTicketDataFromURL();
         
@@ -394,28 +489,11 @@
     }
 
     document.getElementById("kontrol").addEventListener("click", function (e) {
-        const mainSectElement = document.querySelector(".main-sect");
-        const qrBox = document.querySelector('.qr-box');
-        const ticketInfoAfter = document.querySelector(".ticket-info");
-        ticketInfoAfter.style.setProperty('--red-line', "160px")
-        ticketInfoAfter.style.setProperty('--center-x', "10%")
-        document.getElementById("bilet").style.color = "black"
-        e.target.style.color = "red";
-        mainSectElement.style.display = "none";
-        qrBox.style.display = "initial";
+        setActiveTab('kontrol');
     });
 
     document.getElementById("bilet").addEventListener("click", function (e) {
-        const mainSectElement = document.querySelector(".main-sect");
-        const qrBox = document.querySelector('.qr-box');
-        const ticketInfoAfter = document.querySelector(".ticket-info");
-        e.target.style.color = "red";
-        document.getElementById("kontrol").style.color = "black"
-        ticketInfoAfter.style.setProperty('--red-line', "120px")
-        ticketInfoAfter.style.setProperty('--center-x', "-180%");
-        ticketInfoAfter.style.setProperty('--procent-pos', "69.5%")
-        qrBox.style.display = "none";
-        mainSectElement.style.display = "initial";
+        setActiveTab('bilet');
     });
 
     document.addEventListener('DOMContentLoaded', function() {
